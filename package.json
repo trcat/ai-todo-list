@@ -1,0 +1,45 @@
+{
+  "name": "hello-vue",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
+    "core-js": "^3.6.5",
+    "element-plus": "^2.13.1",
+    "vue": "^3.2.13"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.19",
+    "@vue/cli-plugin-eslint": "~4.5.19",
+    "@vue/cli-service": "~4.5.19",
+    "@vue/compiler-sfc": "^3.2.13",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
+}
