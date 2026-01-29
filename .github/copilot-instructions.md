@@ -53,6 +53,23 @@ npm run build      # Production build to dist/
 npm run lint       # Run ESLint with Vue plugin (vue3-essential config)
 ```
 
+## GitHub Pages Deployment
+
+The project is configured for automatic deployment to GitHub Pages:
+- **Workflow**: `.github/workflows/deploy.yml`
+- **Trigger**: Automatic on push to `main` branch
+- **Build Process**: 
+  1. Installs dependencies with `npm install`
+  2. Builds project with `npm run build`
+  3. Deploys `dist/` directory to GitHub Pages
+- **Base URL**: `https://trcat.github.io/ai-todo-list/`
+- **Configuration**: `vue.config.js` sets correct `publicPath` for production
+
+To enable GitHub Pages:
+1. Go to repository Settings → Pages
+2. Select "GitHub Actions" as the deployment source
+3. Push to main branch to trigger automatic deployment
+
 ## File Locations
 - Components: `src/components/`
 - Main app: `src/App.vue`, `src/main.js`
