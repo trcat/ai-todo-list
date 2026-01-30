@@ -3,9 +3,19 @@
     <el-container>
       <el-header class="app-header">
         <div class="logo">Todo App</div>
-        <div v-if="currentUser" class="user-info">
-          <span>欢迎, {{ currentUser }}</span>
-          <el-button type="info" size="small" @click="handleLogout" style="margin-left: 15px;">退出登录</el-button>
+        <div class="header-right">
+          <el-tooltip :content="isDark ? '切换到浅色模式' : '切换到深色模式'" placement="bottom">
+            <el-button 
+              :icon="isDark ? 'Sunny' : 'Moon'" 
+              circle 
+              @click="toggleTheme"
+              class="theme-toggle"
+            />
+          </el-tooltip>
+          <div v-if="currentUser" class="user-info">
+            <span>欢迎, {{ currentUser }}</span>
+            <el-button type="info" size="small" @click="handleLogout" style="margin-left: 15px;">退出登录</el-button>
+          </div>
         </div>
       </el-header>
       
@@ -37,7 +47,16 @@ export default {
   data() {
     return {
       showLogin: false,
-      currentUser: localStorage.getItem('currentUser') || ''
+      currentUser: localStorage.getItem('currentUser') || '',
+      isDark: false
+    }
+  },
+  mounted() {
+    this.initTheme()
+  },
+  beforeUnmount() {
+    if (this.mediaQuery) {
+      this.mediaQuery.removeEventListener('change', this.handleSystemThemeChange)
     }
   },
   methods: {
@@ -49,31 +68,102 @@ export default {
     handleLogout() {
       this.currentUser = ''
       localStorage.removeItem('currentUser')
+    },
+    initTheme() {
+      // 1. 先检查用户是否有手动设置过主题
+      const savedTheme = localStorage.getItem('theme')
+      if (savedTheme) {
+        this.isDark = savedTheme === 'dark'
+      } else {
+        // 2. 如果没有保存的主题，则检测系统主题偏好
+        this.isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      }
+      
+      this.applyTheme()
+      
+      // 3. 监听系统主题变化（仅当用户没有手动设置时）
+      this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      this.handleSystemThemeChange = (e) => {
+        if (!localStorage.getItem('theme')) {
+          this.isDark = e.matches
+          this.applyTheme()
+        }
+      }
+      this.mediaQuery.addEventListener('change', this.handleSystemThemeChange)
+    },
+    toggleTheme() {
+      this.isDark = !this.isDark
+      localStorage.setItem('theme', this.isDark ? 'dark' : 'light')
+      this.applyTheme()
+    },
+    applyTheme() {
+      const html = document.documentElement
+      if (this.isDark) {
+        html.classList.add('dark')
+      } else {
+        html.classList.remove('dark')
+      }
     }
   }
 }
 </script>
 
 <style>
+:root {
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #fff;
+  --text-primary: #303133;
+  --text-secondary: #606266;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --logo-color: #409EFF;
+}
+
+html.dark {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2b2b2b;
+  --text-primary: #e5e5e5;
+  --text-secondary: #b3b3b3;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --logo-color: #79bbff;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #f5f7fa;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .app-header {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 2px 4px var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.theme-toggle {
+  transition: transform 0.3s;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }
 
 .logo {
   font-size: 20px;
   font-weight: bold;
-  color: #409EFF;
+  color: var(--logo-color);
+  transition: color 0.3s;
 }
 
 .login-container {

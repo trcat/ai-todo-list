@@ -14,22 +14,23 @@
             清除已完成
           </el-button>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <form @submit.prevent="addTask" style="display: flex; gap: 10px; margin-top: 15px;">
           <el-select v-model="newTaskPriority" placeholder="优先级" style="width: 100px;">
             <el-option label="低" value="low" />
             <el-option label="中" value="medium" />
             <el-option label="高" value="high" />
           </el-select>
           <el-input
+            ref="taskInput"
             v-model="newTask"
             placeholder="请输入待办事项..."
-            @keyup.enter="addTask"
+            @keydown.enter="handleEnter"
           >
             <template #append>
               <el-button @click="addTask">添加</el-button>
             </template>
           </el-input>
-        </div>
+        </form>
       </div>
     </template>
     
@@ -154,6 +155,18 @@ export default {
     this.loadTodos()
   },
   methods: {
+    handleEnter(event) {
+      // 阻止默认行为和事件冒泡
+      event.preventDefault()
+      event.stopPropagation()
+      
+      // 在移动端，确保键盘不会触发多次
+      if (event.isComposing || event.keyCode === 229) {
+        return
+      }
+      
+      this.addTask()
+    },
     addTask() {
       if (!this.newTask.trim()) {
         ElMessage.warning('请输入内容')
@@ -169,6 +182,14 @@ export default {
       this.newTask = ''
       this.newTaskPriority = 'medium'
       this.saveTodos()
+      ElMessage.success('已添加')
+      
+      // 添加成功后自动聚焦到输入框
+      this.$nextTick(() => {
+        if (this.$refs.taskInput) {
+          this.$refs.taskInput.focus()
+        }
+      })
     },
     removeTask(id) {
       ElMessageBox.confirm(
@@ -260,7 +281,8 @@ export default {
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
+  transition: background-color 0.3s;
 }
 
 :deep(.el-card__body) {
@@ -279,18 +301,33 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  gap: 8px;
+}
+
+.todo-item > div:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.todo-item :deep(.el-checkbox__label) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .todo-actions {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .todo-item-wrapper {
   margin-bottom: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  transition: border-color 0.3s;
 }
 
 .todo-item-wrapper:last-child {
@@ -301,32 +338,35 @@ export default {
   margin-top: 8px;
   margin-left: 32px;
   padding: 8px 12px;
-  background-color: #f5f7fa;
-  border-left: 3px solid #409EFF;
+  background-color: var(--el-fill-color-light);
+  border-left: 3px solid var(--el-color-primary);
   border-radius: 4px;
   font-size: 13px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   white-space: pre-wrap;
   word-break: break-word;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .completed {
   text-decoration: line-through;
-  color: #ccc;
+  color: var(--el-text-color-disabled);
 }
 
 .section-title {
   font-weight: bold;
-  color: #606266;
+  color: var(--el-text-color-regular);
   font-size: 14px;
   margin-top: 15px;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--el-border-color-lighter);
+  transition: color 0.3s, border-color 0.3s;
 }
 
 .completed-section {
-  background-color: #fafafa;
+  background-color: var(--el-fill-color-lighter);
+  transition: background-color 0.3s;
 }
 
 @media (max-width: 600px) {
@@ -335,15 +375,19 @@ export default {
     border-radius: 8px;
   }
 
-  .todo-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .todo-actions {
+    gap: 4px;
   }
 
-  .todo-actions {
-    width: 100%;
-    justify-content: flex-end;
+  .todo-actions :deep(.el-button--small) {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .todo-actions :deep(.el-button.is-circle) {
+    width: 28px;
+    height: 28px;
+    padding: 6px;
   }
 
   .todo-description {
