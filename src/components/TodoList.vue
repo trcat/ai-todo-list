@@ -1,9 +1,25 @@
 <template>
-  <el-card class="box-card" style="max-width: 600px; margin: 20px auto;">
+  <el-card class="box-card">
     <template #header>
       <div class="card-header">
-        <span>{{ username }} 的待办事项</span>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span>{{ username }} 的待办事项</span>
+          <el-button 
+            v-if="completedTodos.length > 0" 
+            type="danger" 
+            size="small" 
+            plain
+            @click="clearCompleted"
+          >
+            清除已完成
+          </el-button>
+        </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <el-select v-model="newTaskPriority" placeholder="优先级" style="width: 100px;">
+            <el-option label="低" value="low" />
+            <el-option label="中" value="medium" />
+            <el-option label="高" value="high" />
+          </el-select>
           <el-input
             v-model="newTask"
             placeholder="请输入待办事项..."
@@ -17,9 +33,7 @@
       </div>
     </template>
     
-    <div v-if="todos.length === 0" style="text-align: center; color: #999; padding: 20px;">
-      暂无待办事项，快去添加一个吧！
-    </div>
+    <el-empty v-if="todos.length === 0" description="暂无待办事项，快去添加一个吧！" />
 
     <div v-else>
       <!-- 未完成的任务 -->
@@ -27,10 +41,18 @@
         <div class="section-title">进行中 ({{ incompleteTodos.length }})</div>
         <div v-for="todo in incompleteTodos" :key="todo.id" class="todo-item-wrapper">
           <div class="text item todo-item">
-            <el-checkbox v-model="todo.completed" @change="saveTodos">
-              <span :class="{ completed: todo.completed }">{{ todo.text }}</span>
-            </el-checkbox>
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+              <el-checkbox v-model="todo.completed" @change="saveTodos">
+                <span :class="{ completed: todo.completed }">{{ todo.text }}</span>
+              </el-checkbox>
+              <el-tag :type="getPriorityType(todo.priority)" size="small">
+                {{ getPriorityLabel(todo.priority) }}
+              </el-tag>
+            </div>
             <div class="todo-actions">
+              <el-button type="warning" text size="small" @click="openPriorityDialog(todo)">
+                优先级
+              </el-button>
               <el-button type="info" text size="small" @click="openDescriptionDialog(todo)">
                 {{ todo.description ? '查看' : '添加' }}描述
               </el-button>
@@ -62,7 +84,7 @@
     </div>
 
     <!-- 描述编辑对话框 -->
-    <el-dialog v-model="showDescriptionDialog" title="编辑描述" width="50%">
+    <el-dialog v-model="showDescriptionDialog" title="编辑描述" width="300px" class="todo-dialog">
       <el-input
         v-model="tempDescription"
         type="textarea"
@@ -76,11 +98,26 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 优先级编辑对话框 -->
+    <el-dialog v-model="showPriorityDialog" title="设置优先级" width="300px" class="todo-dialog">
+      <el-radio-group v-model="tempPriority">
+        <el-radio label="low">低</el-radio>
+        <el-radio label="medium">中</el-radio>
+        <el-radio label="high">高</el-radio>
+      </el-radio-group>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showPriorityDialog = false">取消</el-button>
+          <el-button type="primary" @click="savePriority">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
 <script>
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
   name: 'TodoList',
@@ -93,15 +130,21 @@ export default {
   data() {
     return {
       newTask: '',
+      newTaskPriority: 'medium',
       todos: [],
       editingTodo: null,
       showDescriptionDialog: false,
-      tempDescription: ''
+      tempDescription: '',
+      showPriorityDialog: false,
+      tempPriority: 'medium'
     }
   },
   computed: {
     incompleteTodos() {
-      return this.todos.filter(todo => !todo.completed)
+      const priorityOrder = { high: 1, medium: 2, low: 3 }
+      return this.todos
+        .filter(todo => !todo.completed)
+        .sort((a, b) => priorityOrder[a.priority || 'medium'] - priorityOrder[b.priority || 'medium'])
     },
     completedTodos() {
       return this.todos.filter(todo => todo.completed)
@@ -120,14 +163,27 @@ export default {
         id: Date.now(),
         text: this.newTask,
         description: '',
+        priority: this.newTaskPriority,
         completed: false
       })
       this.newTask = ''
+      this.newTaskPriority = 'medium'
       this.saveTodos()
     },
     removeTask(id) {
-      this.todos = this.todos.filter(todo => todo.id !== id)
-      this.saveTodos()
+      ElMessageBox.confirm(
+        '确定要删除这个待办事项吗？',
+        '删除确认',
+        {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        this.todos = this.todos.filter(todo => todo.id !== id)
+        this.saveTodos()
+        ElMessage.success('已删除')
+      }).catch(() => {})
     },
     openDescriptionDialog(todo) {
       this.editingTodo = todo
@@ -142,6 +198,33 @@ export default {
         ElMessage.success('描述已保存')
       }
     },
+    openPriorityDialog(todo) {
+      this.editingTodo = todo
+      this.tempPriority = todo.priority || 'medium'
+      this.showPriorityDialog = true
+    },
+    savePriority() {
+      if (this.editingTodo) {
+        this.editingTodo.priority = this.tempPriority
+        this.saveTodos()
+        this.showPriorityDialog = false
+        ElMessage.success('优先级已更新')
+      }
+    },
+    clearCompleted() {
+      const count = this.completedTodos.length
+      this.todos = this.todos.filter(todo => !todo.completed)
+      this.saveTodos()
+      ElMessage.success(`已清除 ${count} 个已完成任务`)
+    },
+    getPriorityType(priority) {
+      const types = { high: 'danger', medium: 'warning', low: 'info' }
+      return types[priority] || 'info'
+    },
+    getPriorityLabel(priority) {
+      const labels = { high: '高', medium: '中', low: '低' }
+      return labels[priority] || '中'
+    },
     saveTodos() {
       localStorage.setItem(`todos_${this.username}`, JSON.stringify(this.todos))
     },
@@ -149,7 +232,10 @@ export default {
       const saved = localStorage.getItem(`todos_${this.username}`)
       if (saved) {
         try {
-          this.todos = JSON.parse(saved)
+          this.todos = JSON.parse(saved).map(todo => ({
+            ...todo,
+            priority: todo.priority || 'medium'
+          }))
         } catch (e) {
           this.todos = []
         }
@@ -162,6 +248,27 @@ export default {
 </script>
 
 <style scoped>
+.box-card {
+  max-width: 600px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 140px);
+}
+
+:deep(.el-card__header) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #fff;
+}
+
+:deep(.el-card__body) {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
 .card-header {
   display: flex;
   flex-direction: column;
@@ -220,5 +327,32 @@ export default {
 
 .completed-section {
   background-color: #fafafa;
+}
+
+@media (max-width: 600px) {
+  .box-card {
+    margin: 12px 0;
+    border-radius: 8px;
+  }
+
+  .todo-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .todo-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .todo-description {
+    margin-left: 0;
+  }
+
+  :deep(.todo-dialog .el-dialog) {
+    width: min(600px, 92vw) !important;
+    margin: 10vh auto;
+  }
 }
 </style>

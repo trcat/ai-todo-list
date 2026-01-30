@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" title="登录" width="30%">
+  <el-dialog v-model="visible" title="登录" width="300px" class="login-dialog">
     <el-form :model="form" label-width="80px">
       <el-form-item label="用户名">
         <el-input v-model="form.username" placeholder="请输入用户名"></el-input>
@@ -60,3 +60,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@media (max-width: 600px) {
+  :deep(.login-dialog .el-dialog) {
+    width: min(420px, 92vw) !important;
+    margin: 10vh auto;
+  }
+}
+</style>

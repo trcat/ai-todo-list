@@ -9,7 +9,7 @@
         </div>
       </el-header>
       
-      <el-main>
+      <el-main class="app-main">
         <div v-if="!currentUser" class="login-container">
           <el-empty description="请先登录以管理你的待办事项">
             <el-button type="primary" size="large" @click="showLogin = true">点击登录</el-button>
@@ -81,5 +81,57 @@ body {
   justify-content: center;
   align-items: center;
   height: 80vh;
+}
+
+.app-main {
+  padding: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.user-info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    padding: 12px 16px;
+  }
+
+  .logo {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .user-info span {
+    font-size: 14px;
+    max-width: 120px;
+  }
+
+  .user-info .el-button {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .app-main {
+    padding: 12px;
+  }
+
+  .login-container {
+    height: auto;
+    padding: 24px 0;
+  }
 }
 </style>

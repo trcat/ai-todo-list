@@ -16,7 +16,7 @@ app.mount('#app')
 // 注册 Service Worker 以支持 PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').then(
+    navigator.serviceWorker.register('/ai-todo-list/service-worker.js').then(
       (registration) => {
         console.log('Service Worker 注册成功:', registration)
       },
@@ -41,4 +41,3 @@ window.addEventListener('appinstalled', () => {
   console.log('应用已安装到本地')
   deferredPrompt = null
 })
-

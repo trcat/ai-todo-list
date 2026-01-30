@@ -1,5 +1,5 @@
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+# Build and deploy Vue.js app with Vite
+name: Deploy to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -29,29 +29,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build project
-        run: npm run build
+        run: pnpm build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
       
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./dist
-          destination: ./_site
-      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
 
   # Deployment job
   deploy:
@@ -64,4 +65,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
