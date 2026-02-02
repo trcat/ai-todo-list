@@ -2,8 +2,14 @@
 node_modules
 /dist
 
+# Nuxt dev/build outputs
+.output
+.nuxt
+.nitro
+.cache
 
 # local env files
+.env
 .env.local
 .env.*.local
 
@@ -21,3 +27,12 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Database
+*.db
+*.db-journal
+.data
+
+# PWA
+public/sw.js
+public/workbox-*.js
