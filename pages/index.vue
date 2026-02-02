@@ -36,16 +36,33 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount, type Ref } from 'vue'
 import { Sunny, Moon } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import LoginModal from '~/components/LoginModal.vue'
 import TodoList from '~/components/TodoList.vue'
 
-const showLogin = ref(false)
-const user = ref(null)
-const isDark = ref(false)
-let mediaQuery = null
+interface User {
+  username: string
+  id?: string
+  [key: string]: any
+}
+
+interface LoginCredentials {
+  username: string
+  password: string
+}
+
+interface LoginResponse {
+  token: string
+  user: User
+}
+
+const showLogin: Ref<boolean> = ref(false)
+const user: Ref<User | null> = ref(null)
+const isDark: Ref<boolean> = ref(false)
+let mediaQuery: MediaQueryList | null = null
 
 onMounted(() => {
   initTheme()
@@ -58,11 +75,11 @@ onBeforeUnmount(() => {
   }
 })
 
-async function checkAuth() {
+async function checkAuth(): Promise<void> {
   const token = useCookie('auth_token')
   if (token.value) {
     try {
-      const { data } = await useFetch('/api/auth/me', {
+      const { data } = await useFetch<User>('/api/auth/me', {
         headers: {
           Authorization: `Bearer ${token.value}`
         }
@@ -77,9 +94,9 @@ async function checkAuth() {
   }
 }
 
-async function onLogin(credentials) {
+async function onLogin(credentials: LoginCredentials): Promise<void> {
   try {
-    const { data, error } = await useFetch('/api/auth/login', {
+    const { data, error } = await useFetch<LoginResponse>('/api/auth/login', {
       method: 'POST',
       body: credentials
     })
@@ -101,18 +118,18 @@ async function onLogin(credentials) {
   }
 }
 
-function handleLogout() {
+function handleLogout(): void {
   const token = useCookie('auth_token')
   token.value = null
   user.value = null
   ElMessage.success('已退出登录')
 }
 
-async function refreshUser() {
+async function refreshUser(): Promise<void> {
   await checkAuth()
 }
 
-function initTheme() {
+function initTheme(): void {
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme) {
     isDark.value = savedTheme === 'dark'
@@ -126,20 +143,20 @@ function initTheme() {
   mediaQuery.addEventListener('change', handleSystemThemeChange)
 }
 
-function handleSystemThemeChange(e) {
+function handleSystemThemeChange(e: MediaQueryListEvent): void {
   if (!localStorage.getItem('theme')) {
     isDark.value = e.matches
     applyTheme()
   }
 }
 
-function toggleTheme() {
+function toggleTheme(): void {
   isDark.value = !isDark.value
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
   applyTheme()
 }
 
-function applyTheme() {
+function applyTheme(): void {
   const html = document.documentElement
   if (isDark.value) {
     html.classList.add('dark')

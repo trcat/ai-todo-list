@@ -79,10 +79,14 @@ export default defineNuxtConfig({
 
   // Nitro 服务器配置
   nitro: {
-    storage: {
-      db: {
-        driver: 'fs',
-        base: './.data/db'
+    experimental: {
+      // 禁用 wasm 优化以避免 crypto.hash 错误
+      wasm: false
+    },
+    // 使用 Node.js 运行时的 crypto 模块
+    unenv: {
+      inject: {
+        crypto: 'node:crypto'
       }
     }
   }
