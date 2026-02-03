@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-01-01',
+  future: {
+    compatibilityVersion: 4
+  },
   devtools: { enabled: true },
   
   modules: [
@@ -38,10 +41,11 @@ export default defineNuxtConfig({
     },
     workbox: {
       navigateFallback: '/',
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}']
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      globIgnores: ['**/node_modules/**', '**/.nuxt/**']
     },
     devOptions: {
-      enabled: true,
+      enabled: false, // 开发模式下禁用 PWA 以避免文件匹配问题
       type: 'module'
     }
   },

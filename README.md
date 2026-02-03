@@ -5,7 +5,7 @@
 ## 技术栈
 
 ### 前端
-- **Nuxt 4** - Vue 全栈框架
+- **Nuxt 4** - Vue 全栈框架（最新版本）
 - **Vue 3** - 使用 Composition API + `<script setup>`
 - **Element Plus** - UI 组件库
 - **TypeScript** - 类型安全
@@ -16,7 +16,7 @@
 - **Prisma** - ORM 数据库工具
 - **SQLite** - 数据库
 - **JWT (jose)** - 身份认证
-- **bcrypt** - 密码加密
+- **bcryptjs** - 密码加密（纯 JS 实现）
 
 ## 功能特性
 
@@ -210,7 +210,7 @@ pnpm exec prisma migrate dev  # 创建迁移
 1. **全栈一体化**：单一代码库同时包含前端和后端
 2. **类型安全**：全面使用 TypeScript
 3. **现代化 API**：使用 Composition API + `<script setup>`
-4. **安全认证**：JWT Token + bcrypt 密码加密
+4. **安全认证**：JWT Token + bcryptjs 密码加密
 5. **数据持久化**：Prisma ORM + SQLite
 6. **PWA 支持**：可安装、离线可用
 7. **响应式设计**：完美适配移动端

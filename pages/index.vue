@@ -24,7 +24,7 @@
       <el-main class="app-main">
         <div v-if="!user" class="login-container">
           <el-empty description="请先登录以管理你的待办事项">
-            <el-button type="primary" size="large" @click="showLogin = true">点击登录</el-button>
+            <el-button type="primary" size="large" @click="handleLoginClick">点击登录</el-button>
           </el-empty>
         </div>
 
@@ -163,6 +163,11 @@ function applyTheme(): void {
   } else {
     html.classList.remove('dark')
   }
+}
+
+function handleLoginClick(): void {
+  showLogin.value = true
+  console.log('click')
 }
 </script>
 
