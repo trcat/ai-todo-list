@@ -15,38 +15,25 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 查找用户
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { username }
     })
 
-    // 如果用户不存在，自动注册
+    // 用户不存在
     if (!user) {
-      const hashedPassword = await hashPassword(password)
-      user = await prisma.user.create({
-        data: {
-          username,
-          password: hashedPassword
-        }
+      throw createError({
+        statusCode: 401,
+        message: '用户名或密码错误'
       })
-      
-      const token = await signToken({ userId: user.id, username: user.username })
-      
-      return {
-        token,
-        user: {
-          id: user.id,
-          username: user.username
-        }
-      }
     }
 
-    // 用户存在，验证密码
+    // 验证密码
     const isValid = await comparePassword(password, user.password)
     
     if (!isValid) {
       throw createError({
         statusCode: 401,
-        message: '密码错误'
+        message: '用户名或密码错误'
       })
     }
 
