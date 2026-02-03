@@ -83,6 +83,7 @@ export default defineNuxtConfig({
 
   // Nitro 服务器配置
   nitro: {
+    preset: 'vercel', // 配置 Vercel 预设
     experimental: {
       // 禁用 wasm 优化以避免 crypto.hash 错误
       wasm: false
