@@ -2,7 +2,7 @@
 # 用于解决登录接口 500 错误
 
 Write-Host "🚀 Vercel 部署配置助手" -ForegroundColor Cyan
-Write-Host "=" * 50
+Write-Host ("=" * 50)
 
 # 检查 Vercel CLI
 Write-Host "`n📦 检查 Vercel CLI..." -ForegroundColor Yellow
@@ -12,7 +12,8 @@ if (-not $vercelInstalled) {
     Write-Host "正在安装..." -ForegroundColor Yellow
     pnpm add -g vercel
     Write-Host "✅ Vercel CLI 安装完成" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "✅ Vercel CLI 已安装" -ForegroundColor Green
 }
 
@@ -22,7 +23,8 @@ $whoami = vercel whoami 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "需要登录 Vercel..." -ForegroundColor Yellow
     vercel login
-} else {
+}
+else {
     Write-Host "✅ 已登录: $whoami" -ForegroundColor Green
 }
 
@@ -31,7 +33,8 @@ Write-Host "`n🔗 链接 Vercel 项目..." -ForegroundColor Yellow
 if (-not (Test-Path ".vercel")) {
     Write-Host "首次配置，需要选择项目..." -ForegroundColor Yellow
     vercel link
-} else {
+}
+else {
     Write-Host "✅ 项目已链接" -ForegroundColor Green
 }
 
@@ -40,7 +43,8 @@ Write-Host "`n⬇️  拉取环境变量..." -ForegroundColor Yellow
 vercel env pull .env
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ 环境变量已拉取到 .env" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "⚠️  拉取环境变量失败" -ForegroundColor Red
     Write-Host "请确保在 Vercel Dashboard 中配置了以下环境变量：" -ForegroundColor Yellow
     Write-Host "  - DATABASE_URL" -ForegroundColor White
@@ -58,13 +62,15 @@ if (Test-Path ".env") {
     
     if ($hasDatabaseUrl) {
         Write-Host "  ✅ DATABASE_URL 已配置" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "  ❌ DATABASE_URL 未配置" -ForegroundColor Red
     }
     
     if ($hasJwtSecret) {
         Write-Host "  ✅ JWT_SECRET 已配置" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "  ❌ JWT_SECRET 未配置" -ForegroundColor Red
     }
     
@@ -73,7 +79,8 @@ if (Test-Path ".env") {
         Write-Host "访问: https://vercel.com/dashboard → 项目 → Settings → Environment Variables" -ForegroundColor Cyan
         exit 1
     }
-} else {
+}
+else {
     Write-Host "❌ .env 文件不存在" -ForegroundColor Red
     exit 1
 }
@@ -88,7 +95,8 @@ Write-Host "`n🔧 生成 Prisma Client..." -ForegroundColor Yellow
 pnpm prisma generate
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Prisma Client 生成完成" -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "❌ Prisma Client 生成失败" -ForegroundColor Red
     exit 1
 }
@@ -101,12 +109,14 @@ if ($confirm -eq "" -or $confirm -eq "Y" -or $confirm -eq "y") {
     pnpm prisma db push
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ 数据库初始化完成" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "❌ 数据库初始化失败" -ForegroundColor Red
         Write-Host "请检查 DATABASE_URL 是否正确" -ForegroundColor Yellow
         exit 1
     }
-} else {
+}
+else {
     Write-Host "⏭️  跳过数据库初始化" -ForegroundColor Yellow
 }
 
@@ -124,10 +134,12 @@ if ($gitStatus) {
     git push
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ 代码已推送，Vercel 将自动部署" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "❌ 推送失败" -ForegroundColor Red
     }
-} else {
+}
+else {
     Write-Host "✅ 没有需要提交的更改" -ForegroundColor Green
 }
 
@@ -136,7 +148,7 @@ Write-Host "`n📊 查看部署状态..." -ForegroundColor Yellow
 Write-Host "访问 Vercel Dashboard 查看部署进度:" -ForegroundColor White
 Write-Host "https://vercel.com/dashboard" -ForegroundColor Cyan
 
-Write-Host "`n" + "=" * 50
+Write-Host ("`n" + ("=" * 50))
 Write-Host "✨ 配置完成！" -ForegroundColor Green
 Write-Host "`n下一步:" -ForegroundColor Yellow
 Write-Host "1. 等待 Vercel 自动部署完成 (约 1-2 分钟)" -ForegroundColor White

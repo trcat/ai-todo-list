@@ -35,3 +35,4 @@ pnpm-debug.log*
 # PWA
 public/sw.js
 public/workbox-*.js
+.vercel
