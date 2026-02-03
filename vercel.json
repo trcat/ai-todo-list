@@ -4,14 +4,5 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "framework": "nuxtjs",
-  "regions": ["sin1"],
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret"
-  },
-  "build": {
-    "env": {
-      "DATABASE_URL": "@database_url"
-    }
-  }
+  "regions": ["sin1"]
 }
